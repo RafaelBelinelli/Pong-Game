@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.ContextMenu;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -17,18 +18,32 @@ import androidx.core.content.ContextCompat;
  */
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
+    private final Player player;
     private Gameloop gameLoop;
-    private Context context;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                player.setPosition((double) event.getX(), (double) event.getY());
+                return true;
+        }
+
+        return super.onTouchEvent(event);
+    }
 
     public Game(Context context) {
         super(context);
 
+        // Get surface holder and add callback
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
 
-
-        this.context = context;
         gameLoop = new Gameloop(this, surfaceHolder);
+
+        player = new Player(getContext(), 50, 50, 100, 250);
 
         setFocusable(true);
     }
@@ -53,12 +68,14 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         super.draw(canvas);
         drawFPS(canvas);
         drawUPS(canvas);
+
+        player.draw(canvas);
     }
 
     public void drawUPS(Canvas canvas) {
         String averageUPS = Double.toString(gameLoop.getAverageUPS());
         Paint paint = new Paint();
-        int color = ContextCompat.getColor(context, R.color.Magenta);
+        int color = ContextCompat.getColor(getContext(), R.color.Magenta);
         paint.setColor(color);
         paint.setTextSize(50);
         canvas.drawText("UPS: " + averageUPS, 100, 100, paint);
@@ -67,12 +84,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     public void drawFPS(Canvas canvas) {
         String averageFPS = Double.toString(gameLoop.getAverageFPS());
         Paint paint = new Paint();
-        int color = ContextCompat.getColor(context, R.color.Magenta);
+        int color = ContextCompat.getColor(getContext(), R.color.Magenta);
         paint.setColor(color);
         paint.setTextSize(50);
         canvas.drawText("FPS: " + averageFPS, 100, 200, paint);
     }
 
     public void update() {
+        player.update();
     }
 }
