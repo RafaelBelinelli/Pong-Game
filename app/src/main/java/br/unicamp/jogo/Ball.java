@@ -27,10 +27,14 @@ public class Ball {
 
     private Enemy enemy;
 
+    private int pontPlayer = 0;
+    private int pontCPU = 0;
+
     public Ball (Context context, double height, double width, Enemy enemy) {
         paint = new Paint();
         int color = ContextCompat.getColor(context, R.color.ball);
         paint.setColor(color);
+        paint.setTextSize(80);
         paint.setStyle(Paint.Style.FILL);
 
         positionLeft = ((width / 2.0) - 25);
@@ -51,22 +55,43 @@ public class Ball {
 
     boolean inverte = false;
     boolean comecou = false;
+    int j = 25;
     public void draw(Canvas canvas, double positionR, double positionT) {
+        /*for (int i = 0; i <= this.screenHeight; i+=120) {
+            j += 20;
+            canvas.drawRect((float) 110, (float) j, (float) 130, (float) j + 100, paint);
+            j += 100;
+        }*/
 
-        if (Math.ceil(positionRight) >= this.screenWidth) {
-            angle = -90;
-        }
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j, (float) (this.screenWidth / 2) + 32, (float) j + 100, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 150, (float) (this.screenWidth / 2) + 32, (float) j + 250, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 300, (float) (this.screenWidth / 2) + 32, (float) j + 400, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 450, (float) (this.screenWidth / 2) + 32, (float) j + 550, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 600, (float) (this.screenWidth / 2) + 32, (float) j + 700, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 750, (float) (this.screenWidth / 2) + 32, (float) j + 850, paint);
+        canvas.drawRect((float) (this.screenWidth / 2) + 12, (float) j + 900, (float) (this.screenWidth / 2) + 32, (float) j + 1000, paint);
 
         // Alguem perdeu
-        if (Math.ceil(positionLeft) <= 0) {
+        if (Math.ceil(positionRight) <= 0 || Math.ceil(positionLeft) >= this.screenWidth) {
             comecou = false;
             inverte = false;
 
             if (Math.ceil(positionLeft) <= 0) {
                 angle = 90;
-            }
-            if (Math.ceil(positionRight) >= this.screenWidth) {
+                this.pontCPU++;
+
+                if (this.pontCPU == 10) {
+                    pontCPU = 0;
+                    pontPlayer = 0;
+                }
+            } else if (Math.ceil(positionRight) >= this.screenWidth) {
                 angle = -90;
+                this.pontPlayer++;
+
+                if (this.pontPlayer == 10) {
+                    pontCPU = 0;
+                    pontPlayer = 0;
+                }
             }
 
             positionLeft = ((this.screenWidth / 2.0) - 25);
@@ -74,12 +99,12 @@ public class Ball {
             positionRight = ((this.screenWidth / 2.0) + 25);
             positionBottom = ((this.screenHeight / 2.0) + 25);
 
-            positionX = screenHeight / 2.0;
+            positionX = screenWidth / 2.0;
             positionY = screenHeight / 2.0;
         }
 
         // Bateu no chão ou no teto
-        if (Math.ceil(positionBottom) >= Math.ceil(screenHeight) || Math.ceil(positionTop) <= 0) {
+        if (Math.ceil(positionBottom) >= Math.ceil(screenHeight) - 20 || Math.ceil(positionTop) <= 20) {
             inverte = !inverte;
         }
 
@@ -93,30 +118,45 @@ public class Ball {
 
             double aleatory = Math.random();
             inverte = aleatory <= 0.5;
+        } else if (Math.ceil(positionRight) >= screenWidth - 100 && ((positionTop + 50 >= enemy.getPositionTop() && positionTop <= enemy.getPositionBottom()) || (enemy.getPositionTop() + 50 <= positionBottom && enemy.getPositionTop() >= positionTop))) {
+            comecou = true;
+            double middlePlayer = enemy.getPositionTop() + 100;
+            double distanceFromCenter = -Math.abs(middlePlayer - positionY);
+
+            angle = 0.35 * distanceFromCenter;
+
+            double aleatory = Math.random();
+            inverte = aleatory <= 0.5;
         }
 
         if (angle > 0) {
-            positionX += 10;
+            positionX += 30;
             if (comecou) {
                 if (inverte) {
-                    positionY -= (30.0/Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
+                    positionY -= (30.0 / Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
                 } else {
-                    positionY += (30.0/Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
+                    positionY += (30.0 / Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
                 }
             }
         } else {
-            positionX -= 10;
+            positionX -= 30;
             if (comecou) {
                 if (inverte) {
-                    positionY -= (30.0/Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
+                    positionY -= (30.0 / Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
                 } else {
-                    positionY += (30.0/Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
+                    positionY += (30.0 / Math.sin(Math.toRadians(90.0))) * Math.sin(Math.toRadians(angle));
                 }
             }
         }
 
-        enemy.setPosition(positionX,positionY);
-        enemy.draw(canvas);
+
+        if (positionY - 100 <= 20) {
+            enemy.setPosition(positionX,120);
+        } else if (positionY + 100 >= this.screenHeight - 20) {
+            enemy.setPosition(positionX,this.screenHeight - 120);
+        } else {
+            enemy.setPosition(positionX,positionY);
+        }
 
         // Bola anda
         positionLeft = positionX - 25;
@@ -125,6 +165,8 @@ public class Ball {
         positionBottom = positionY + 25;
 
         canvas.drawRect((float) positionLeft, (float) positionTop, (float) positionRight, (float) positionBottom, paint);
+        canvas.drawText(Integer.toString(pontPlayer), (float)(screenWidth/2) - 100, (float) 100.0, paint);
+        canvas.drawText(Integer.toString(pontCPU), (float)(screenWidth/2) + 100, (float) 100.0, paint);
     }
 
     public void update() {

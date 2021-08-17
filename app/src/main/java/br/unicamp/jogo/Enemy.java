@@ -19,9 +19,9 @@ public class Enemy {
     public Enemy(Context context, double height, double width) {
         this.context = context;
 
-        this.positionLeft = 500;
+        this.positionLeft = width - 100;
         this.positionTop = (height / 2) - 100;
-        this.positionRight = 500;
+        this.positionRight = width - 50;
         this.positionBottom = (height / 2) + 100;
 
         paint = new Paint();
@@ -33,6 +33,22 @@ public class Enemy {
         this.width = width;
     }
 
+    public double getPositionLeft() {
+        return positionLeft;
+    }
+
+    public double getPositionTop() {
+        return positionTop;
+    }
+
+    public double getPositionRight() {
+        return positionRight;
+    }
+
+    public double getPositionBottom() {
+        return positionBottom;
+    }
+
     public void draw(Canvas canvas) {
         canvas.drawRect((float) positionLeft, (float) positionTop, (float) positionRight, (float) positionBottom, paint);
     }
@@ -41,33 +57,14 @@ public class Enemy {
     }
 
     public void setPosition(double positionX, double positionY) {
-        /*if (this.positionTop + 100 < positionY) {
-            if (positionTop + 5 >= height - 20) {
-                this.positionTop = height - 220;
-                this.positionBottom = height - 20;
-            }
-            else if (positionTop - 5 <= 20) {
-                this.positionTop = 20;
-                this.positionBottom = 220;
-            } else {
-                this.positionTop += 5;
-                this.positionBottom += 5;
-            }
-        }
+        // Pra baixo
+        if (this.positionTop + 100 < positionY) {
+            this.positionTop += 8;
+            this.positionBottom += 8;
+        } // Pra cima
         else if (this.positionTop + 100 > positionY) {
-            if (positionTop + 5 >= height - 20) {
-                this.positionTop = height - 220;
-                this.positionBottom = height - 20;
-            }
-            else if (positionTop - 5 <= 20) {
-                this.positionTop = 20;
-                this.positionBottom = 220;
-            } else {
-                this.positionTop -= 5;
-                this.positionBottom -= 5;
-            }
-        }*/
-        this.positionTop = positionY - 100;
-        this.positionBottom = positionY + 100;
+            this.positionTop -= 8;
+            this.positionBottom -= 8;
+        }
     }
 }
