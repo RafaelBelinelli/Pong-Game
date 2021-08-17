@@ -1,8 +1,10 @@
 package br.unicamp.jogo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -19,6 +21,8 @@ import androidx.core.content.ContextCompat;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final Player player;
+    private final Ball ball;
+    private final Enemy enemy;
     private Gameloop gameLoop;
 
     @Override
@@ -43,7 +47,14 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         gameLoop = new Gameloop(this, surfaceHolder);
 
-        player = new Player(getContext(), 50, 50, 100, 250);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        player = new Player(getContext(), 50, (height / 2) - 100, 100, (height / 2) + 100, height, width);
+        enemy = new Enemy(getContext(), height, width);
+        ball = new Ball(getContext(), height, width, enemy);
 
         setFocusable(true);
     }
@@ -66,10 +77,12 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        drawFPS(canvas);
-        drawUPS(canvas);
+        /*drawFPS(canvas);
+        drawUPS(canvas);*/
 
         player.draw(canvas);
+        ball.draw(canvas, player.getPositionRight(), player.getPositionTop());
+        enemy.draw(canvas);
     }
 
     public void drawUPS(Canvas canvas) {
@@ -78,7 +91,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(), R.color.Magenta);
         paint.setColor(color);
         paint.setTextSize(50);
-        canvas.drawText("UPS: " + averageUPS, 100, 100, paint);
+        canvas.drawText("UPS: " + Math.ceil(Double.parseDouble(averageUPS)), 100, 100, paint);
     }
 
     public void drawFPS(Canvas canvas) {
@@ -87,10 +100,12 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(), R.color.Magenta);
         paint.setColor(color);
         paint.setTextSize(50);
-        canvas.drawText("FPS: " + averageFPS, 100, 200, paint);
+        canvas.drawText("FPS: " + Math.ceil(Double.parseDouble(averageFPS)), 100, 200, paint);
     }
 
     public void update() {
         player.update();
+        ball.update();
+        enemy.update();
     }
 }

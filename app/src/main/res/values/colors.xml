@@ -150,4 +150,6 @@
     <color name="Black">#000000</color>
 
     <color name="player">#FFFAFA</color>
+    <color name="ball">#FFFAFA</color>
+    <color name="enemy">#FFFAFA</color>
 </resources>
